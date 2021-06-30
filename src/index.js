@@ -1,2 +1,1 @@
-'use strict';
-console.log('####: INIT :####');
+import './index.scss';
