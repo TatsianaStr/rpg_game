@@ -1,3 +1,4 @@
+/* eslint-disable comma-dangle */
 const path = require('path');
 const Hapi = require('@hapi/hapi');
 
@@ -6,7 +7,7 @@ const port = process.env.PORT || 3000;
 const FILES = /\.(js|js.map|woff|woff2|svg|bmp|jpg|jpeg|gif|png|ico)(\?v=\d+\.\d+\.\d+)?$/;
 
 const PATH = {
-  '/': 'index.html',
+  '/': 'index.html'
 };
 
 const init = async () => {
