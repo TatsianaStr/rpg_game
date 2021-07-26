@@ -6,7 +6,7 @@ import ClientCamera from './ClientCamera';
 import ClientIntup from './ClientInput';
 
 class ClientEngine {
-  constructor(canvas) {
+  constructor(canvas, game) {
     console.log(canvas);
     Object.assign(this, {
       canvas,
@@ -16,6 +16,9 @@ class ClientEngine {
       images: {},
       camera: new ClientCamera({ canvas, engine: this }),
       input: new ClientIntup(canvas),
+      game,
+      lasrRenderTime: 0,
+      startTime: 0,
     });
     this.ctx = canvas.getContext('2d');
     this.loop = this.loop.bind(this);
@@ -26,6 +29,11 @@ class ClientEngine {
   }
 
   loop(timestamp) {
+    if (!this.startTime) {
+      this.startTime = timestamp;
+    }
+    this.lastRenderTime = timestamp;
+
     const { ctx, canvas } = this;
     ctx.fillStyle = 'black';
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -68,8 +76,9 @@ class ClientEngine {
     const spriteCfg = this.sprites[sprite[0]][sprite[1]];
     const [fx, fy, fw, fh] = spriteCfg.frames[frame];
     const img = this.images[spriteCfg.img];
+    const { camera } = this;
 
-    this.ctx.drawImage(img, fx, fy, fw, fh, x, y, w, h);
+    this.ctx.drawImage(img, fx, fy, fw, fh, x - camera.x, y - camera.y, w, h);
   }
 }
 Object.assign(ClientEngine.prototype, EventSourceMixin);
