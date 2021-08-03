@@ -9,6 +9,6 @@ window.addEventListener('load', () => {
   form.addEventListener('submit', (EO) => {
     EO.preventDefault();
     startGame.parentNode.removeChild(startGame);
-    ClientGame.init({ tagID: 'game', playerName: name.value });
+    ClientGame.init({ tagId: 'game', playerName: name.value });
   });
 });

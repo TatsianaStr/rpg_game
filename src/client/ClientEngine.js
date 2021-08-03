@@ -15,7 +15,7 @@ class ClientEngine {
       canvases: {
         main: canvas,
       },
-      ctx: null,
+      ctx: canvas.getContext('2d'),
       imagesLoaders: [],
       sprites: {},
       images: {},
@@ -25,7 +25,7 @@ class ClientEngine {
       lasrRenderTime: 0,
       startTime: 0,
     });
-    this.ctx = canvas.getContext('2d');
+    this.focus();
     this.loop = this.loop.bind(this);
   }
 
@@ -89,6 +89,7 @@ class ClientEngine {
   addCanvas(name, width, height) {
     let canvas = this.canvases[name];
 
+    console.log(canvas);
     if (!canvas) {
       canvas = document.createElement('canvas');
       canvas.width = width;

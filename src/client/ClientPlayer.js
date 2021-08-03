@@ -11,12 +11,14 @@ class ClientPlayer extends ClientGameObject {
 
   render(time) {
     super.render(time);
+
     const { world } = this;
+
     world.engine.renderSign({
       x: this.x + world.cellWidth / 2,
       y: this.y - 15,
       minWidth: world.cellWidth,
-      maxWidtn: world.cellWidth * 1.5,
+      maxWidth: world.cellWidth * 1.5,
       text: this.playerName,
     });
   }
