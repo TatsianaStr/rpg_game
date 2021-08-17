@@ -4,7 +4,7 @@ import ClientGameObject from './ClientGameObject';
 class ClientPlayer extends ClientGameObject {
   constructor(cfg) {
     super(cfg);
-    this.playerName = 'Tati';
+    this.playerName = cfg.playerName;
     const { world } = cfg.cell;
     world.game.setPlayer(this);
   }
