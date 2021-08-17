@@ -1,96 +1,72 @@
+/* eslint-disable no-plusplus */
+/* eslint-disable import/no-unresolved */
+/* eslint-disable import/extensions */
+import { io } from 'socket.io-client';
 import './index.scss';
 import ClientGame from './client/ClientGame';
+import { getTime } from './common/util';
 // eslint-disable-next-line import/no-unresolved
 window.addEventListener('load', () => {
-  ClientGame.init({ tagId: 'game' });
+  const socket = io('https://jsprochat.herokuapp.com');
+  const startGame = document.querySelector('.start-game');
+  const form = document.getElementById('nameForm');
+  const name = form.querySelector('.input');
+  const chat = document.querySelector('.chat-wrap');
+  const formChat = document.getElementById('formChat');
+  const inputChat = document.getElementById('inputChat');
+  const messageSocket = document.querySelector('.message');
+
+  const submitName = (EO) => {
+    EO.preventDefault();
+    if (name.value) {
+      ClientGame.init({ tagId: 'game', playerName: name.value });
+      socket.emit('start', name.value);
+      chat.style.display = 'block';
+      form.removeEventListener('submit', submitName);
+      startGame.parentNode.removeChild(startGame);
+    }
+  };
+  form.addEventListener('submit', submitName);
+  formChat.addEventListener('submit', (EO) => {
+    EO.preventDefault();
+    if (inputChat.value) {
+      console.log('#### inputChat', inputChat.value);
+      socket.emit('chat message', inputChat.value);
+      inputChat.value = '';
+    }
+  });
+  socket.on('chat connection', (data) => {
+    messageSocket.insertAdjacentHTML(
+      'beforeend',
+      `<p><strong>${getTime(data.time)}</strong> - ${data.msg}/id: ${data.id}</p>`,
+    );
+  });
+  socket.on('chat message', (data) => {
+    messageSocket.insertAdjacentHTML(
+      'beforeend',
+      `<p><strong>${getTime(data.time)}</strong> - ${data.name}: ${data.msg}/id: ${data.id}</p>`,
+    );
+    const colorMsg = document.getElementById('id');
+    colorMsg.style.color = 'red';
+  });
+  socket.on('chat disconnect', (data) => {
+    messageSocket.insertAdjacentHTML(
+      'beforeend',
+      `<p><strong>${getTime(data.time)}</strong> - ${data.msg}/ ${data.id}</p>`,
+    );
+  });
+  socket.on('chat online', (data) => {
+    console.log('####data', data);
+    console.log('####data.names', data.names);
+    let nameUsers = '';
+    for (let i = 0; i < data.names.length; i++) nameUsers += `${data.names[i].name}, `;
+    messageSocket.insertAdjacentHTML(
+      'beforeend',
+      `<p><strong>${getTime(data.time)}</strong> Online now ${data.online}: ${nameUsers}</p>`,
+    );
+  });
+  socket.on('chat start', (data) => {
+    console.log('####data', data);
+    messageSocket.insertAdjacentHTML('beforeend', `<p><strong>${getTime(data.time)}</strong> - ${data.msg}</p>`);
+  });
 });
-// const canvas = document.getElementById('game');
-// const ctx = canvas.getContext('2d');
-// const spriteW = 48;
-// const spriteH = 48;
-
-// const terrain = document.createElement('img');
-// terrain.src = terrainAtlas;
-
-// terrain.addEventListener('load', () => {
-//   console.log(sprites);
-//   const { map } = worldCfg;
-//   map.forEach((cfgRow, y) => {
-//     cfgRow.forEach((cfgCell, x) => {
-//       console.log(cfgCell[0]);
-//       const [sX, sY, sW, sH] = sprites.terrain[cfgCell[0]].frames[0];
-//       ctx.drawImage(terrain, sX, sY, sW, sH, x * spriteW, y * spriteH, spriteW, spriteH);
-//     });
-//   });
-// });
-// const shots = 3;
-// let cycle = 0;
-// const step = 10;
-// let bottomPressed = false;
-// let upPressed = false;
-// let leftPressed = false;
-// let rightPressed = false;
-// const heroH = 48;
-// const heroW = 48;
-// const heroCenterX = heroW / 2;
-// const heroCenterY = heroH / 2;
-// let pX = canvas.offsetWidth / 2 - heroCenterX;
-// let pY = canvas.offsetHeight / 2 - heroCenterY;
-// let spriteP = 0;
-
-// function keyDownHandler(e) {
-//   if (e.key === 'Dowm' || e.key === 'ArrowDown') {
-//     bottomPressed = true;
-//   } else if (e.key === 'Up' || e.key === 'ArrowUp') {
-//     upPressed = true;
-//   } else if (e.key === 'Left' || e.key === 'ArrowLeft') {
-//     leftPressed = true;
-//   } else if (e.key === 'Right' || e.key === 'ArrowRight') {
-//     rightPressed = true;
-//   }
-// }
-// function keyUpHandler(e) {
-//   if (e.key === 'Dowm' || e.key === 'ArrowDown') {
-//     bottomPressed = false;
-//   } else if (e.key === 'Up' || e.key === 'ArrowUp') {
-//     upPressed = false;
-//   } else if (e.key === 'Left' || e.key === 'ArrowLeft') {
-//     leftPressed = false;
-//   } else if (e.key === 'Right' || e.key === 'ArrowRight') {
-//     rightPressed = false;
-//   }
-// }
-// document.addEventListener('keydown', keyDownHandler);
-// document.addEventListener('keyup', keyUpHandler);
-
-// const img = document.createElement('img');
-// img.src = hero;
-
-// function walk(timestamp) {
-//   console.log('#### timestamp', timestamp);
-//   if (bottomPressed) {
-//     pY = Math.min(pY + step, canvas.height - heroH);
-//     cycle = (cycle + 1) % shots;
-//     spriteP = 0;
-//   } else if (upPressed) {
-//     pY = Math.max(pY - step, 0);
-//     cycle = (cycle + 1) % shots;
-//     spriteP = 144;
-//   } else if (leftPressed) {
-//     pX = Math.max(pX - step, 0);
-//     cycle = (cycle + 1) % shots;
-//     spriteP = 48;
-//   } else if (rightPressed) {
-//     pX = Math.min(pX + step, canvas.width - heroH);
-//     cycle = (cycle + 1) % shots;
-//     spriteP = 96;
-//   }
-//   ctx.clearRect(0, 0, 600, 600);
-//   ctx.drawImage(img, cycle * spriteW, spriteP, spriteW, spriteH, pX, pY, 48, 48);
-
-//   window.requestAnimationFrame(walk);
-// }
-
-// img.addEventListener('load', () => {
-//   window.requestAnimationFrame(walk);
-// });
